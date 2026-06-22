@@ -1,0 +1,13 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "edf687f759ec9765bd5db185dbc615c80af77d6e7e19386fc42934e7a80307af",
+      "check_name": "EOLRuby",
+      "message": "Support for Ruby 3.2.2 ended on 2026-03-31",
+      "file": ".ruby-version",
+      "line": 1,
+      "note": "Ambiente usa Ruby 3.2.2; atualizar o runtime é manutenção separada, não é vulnerabilidade no código da aplicação."
+    }
+  ],
+  "brakeman_version": "7.1.0"
+}
