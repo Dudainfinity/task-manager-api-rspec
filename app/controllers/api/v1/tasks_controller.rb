@@ -2,7 +2,7 @@ module Api
   module V1
     class TasksController < ApplicationController
       before_action :set_project
-      before_action :set_task, only: %i[show update destroy complete]
+      before_action :set_task, only: %i[show update destroy complete suggest_subtasks]
 
       # GET /api/v1/projects/:project_id/tasks
       def index
@@ -52,6 +52,18 @@ module Api
           render json: TaskSerializer.new(result.task).serializable_hash, status: :ok
         else
           render json: { error: result.error }, status: :unprocessable_entity
+        end
+      end
+
+      # POST /api/v1/projects/:project_id/tasks/:id/suggest_subtasks
+      # Asks Claude to break the task down into suggested subtasks.
+      def suggest_subtasks
+        result = Tasks::SuggestSubtasks.call(@task)
+
+        if result.success?
+          render json: { task_id: @task.id, suggestions: result.subtasks }, status: :ok
+        else
+          render json: { error: result.error }, status: :bad_gateway
         end
       end
 

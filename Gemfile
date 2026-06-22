@@ -16,6 +16,9 @@ gem "kaminari", "~> 1.2"
 # Cross-Origin Resource Sharing
 gem "rack-cors"
 
+# Official Anthropic SDK — Claude-powered subtask suggestions
+gem "anthropic", "~> 1.49"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

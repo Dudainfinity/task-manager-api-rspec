@@ -11,6 +11,7 @@ Rails.application.routes.draw do
         resources :tasks do
           member do
             post :complete
+            post :suggest_subtasks
           end
         end
       end

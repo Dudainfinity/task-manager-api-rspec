@@ -39,6 +39,7 @@
 | Linguagem | Ruby 3.2 |
 | Framework | Rails 8.1 (modo `--api`) |
 | Banco | PostgreSQL 16 |
+| IA | Anthropic SDK (Claude `claude-opus-4-8`) |
 | Testes | RSpec, FactoryBot, Faker, shoulda-matchers |
 | Cobertura | SimpleCov (linha + branch) |
 | Qualidade | RuboCop (omakase), Brakeman |
@@ -70,7 +71,7 @@ bundle exec rspec
 ```
 
 ```
-70 examples, 0 failures
+78 examples, 0 failures
 Line Coverage:   100.0% (161 / 161)
 Branch Coverage: 100.0% (30 / 30)
 ```
@@ -144,6 +145,7 @@ Base: `/api/v1`
 | `PATCH` | `/projects/:id/tasks/:tid` | Atualiza tarefa |
 | `DELETE` | `/projects/:id/tasks/:tid` | Remove tarefa |
 | `POST` | `/projects/:id/tasks/:tid/complete` | Conclui a tarefa (service object) |
+| `POST` | `/projects/:id/tasks/:tid/suggest_subtasks` | 🤖 Sugere subtarefas com a **Claude** (IA) |
 
 ### Exemplo
 
@@ -155,7 +157,25 @@ curl -X POST http://localhost:3000/api/v1/projects \
 # adiciona e conclui uma tarefa
 curl -X POST http://localhost:3000/api/v1/projects/1/tasks -d "title=Escrever testes&priority=high"
 curl -X POST http://localhost:3000/api/v1/projects/1/tasks/1/complete
+
+# pede sugestões de subtarefas geradas pela Claude
+curl -X POST http://localhost:3000/api/v1/projects/1/tasks/1/suggest_subtasks
+# => { "task_id": 1, "suggestions": [{ "title": "...", "priority": "high" }, ...] }
 ```
+
+## 🤖 Integração com IA (Claude)
+
+O endpoint `suggest_subtasks` usa o **SDK oficial da Anthropic** para pedir à Claude
+(`claude-opus-4-8`) que quebre uma tarefa em subtarefas. A lógica fica isolada no
+service object [`Tasks::SuggestSubtasks`](app/services/tasks/suggest_subtasks.rb), que
+força uma **tool call** para garantir saída estruturada (sem parsing frágil de texto).
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...   # necessário em runtime; nunca commitado
+```
+
+> **Testes não chamam a API real**: o cliente Anthropic é injetável e fica *stubado*
+> nos specs, então a suíte (e o CI) roda sem chave e sem rede — mantendo 100% de cobertura.
 
 ## 📝 Licença
 

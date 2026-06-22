@@ -98,4 +98,33 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
       expect(response.parsed_body['error']).to eq('Task is already done')
     end
   end
+
+  describe 'POST /api/v1/projects/:project_id/tasks/:id/suggest_subtasks' do
+    let(:task) { create(:task, project: project) }
+
+    it 'returns the AI-suggested subtasks' do
+      result = Tasks::SuggestSubtasks::Result.new(
+        success: true,
+        subtasks: [ { title: 'Write the migration', priority: 'high' } ],
+        error: nil
+      )
+      allow(Tasks::SuggestSubtasks).to receive(:call).with(an_instance_of(Task)).and_return(result)
+
+      post "/api/v1/projects/#{project.id}/tasks/#{task.id}/suggest_subtasks"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body['task_id']).to eq(task.id)
+      expect(response.parsed_body['suggestions']).to eq([ { 'title' => 'Write the migration', 'priority' => 'high' } ])
+    end
+
+    it 'returns 502 when the AI provider fails' do
+      result = Tasks::SuggestSubtasks::Result.new(success: false, subtasks: [], error: 'rate limited')
+      allow(Tasks::SuggestSubtasks).to receive(:call).and_return(result)
+
+      post "/api/v1/projects/#{project.id}/tasks/#{task.id}/suggest_subtasks"
+
+      expect(response).to have_http_status(:bad_gateway)
+      expect(response.parsed_body['error']).to eq('rate limited')
+    end
+  end
 end
