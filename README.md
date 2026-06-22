@@ -98,6 +98,9 @@ A imagem publicada pode ser baixada com:
 docker pull ghcr.io/dudainfinity/task-manager-api-rspec:latest
 ```
 
+> O pacote no GHCR nasce **privado**. Para permitir `docker pull` anônimo, defina a
+> visibilidade como *public* em **Packages → task-manager-api-rspec → Package settings**.
+
 ## 🗂️ Modelo de domínio
 
 ```
