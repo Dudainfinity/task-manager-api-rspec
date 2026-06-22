@@ -1,5 +1,7 @@
 class Task < ApplicationRecord
   belongs_to :project
+  belongs_to :parent, class_name: "Task", optional: true
+  has_many :subtasks, class_name: "Task", foreign_key: :parent_id, inverse_of: :parent, dependent: :destroy
 
   enum :status, { todo: 0, in_progress: 1, done: 2 }
   enum :priority, { low: 0, medium: 1, high: 2 }

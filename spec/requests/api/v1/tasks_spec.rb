@@ -102,19 +102,27 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
   describe 'POST /api/v1/projects/:project_id/tasks/:id/suggest_subtasks' do
     let(:task) { create(:task, project: project) }
 
-    it 'returns the AI-suggested subtasks' do
-      result = Tasks::SuggestSubtasks::Result.new(
-        success: true,
-        subtasks: [ { title: 'Write the migration', priority: 'high' } ],
-        error: nil
-      )
+    def stub_suggestions(subtasks)
+      result = Tasks::SuggestSubtasks::Result.new(success: true, subtasks: subtasks, error: nil)
       allow(Tasks::SuggestSubtasks).to receive(:call).with(an_instance_of(Task)).and_return(result)
+    end
 
-      post "/api/v1/projects/#{project.id}/tasks/#{task.id}/suggest_subtasks"
+    it 'persists the AI suggestions as child tasks' do
+      stub_suggestions([
+                         { title: 'Write the migration', priority: 'high' },
+                         { title: 'Add the model spec',  priority: 'medium' }
+                       ])
 
-      expect(response).to have_http_status(:ok)
-      expect(response.parsed_body['task_id']).to eq(task.id)
-      expect(response.parsed_body['suggestions']).to eq([ { 'title' => 'Write the migration', 'priority' => 'high' } ])
+      expect do
+        post "/api/v1/projects/#{project.id}/tasks/#{task.id}/suggest_subtasks"
+      end.to change(task.subtasks, :count).by(2)
+
+      expect(response).to have_http_status(:created)
+      data = response.parsed_body['data']
+      expect(data.size).to eq(2)
+      expect(data.map { |t| t['attributes']['parent_id'] }).to all(eq(task.id))
+      expect(data.map { |t| t['attributes']['status'] }).to all(eq('todo'))
+      expect(task.subtasks.first.project).to eq(project)
     end
 
     it 'returns 502 when the AI provider fails' do
@@ -125,6 +133,19 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
 
       expect(response).to have_http_status(:bad_gateway)
       expect(response.parsed_body['error']).to eq('rate limited')
+    end
+
+    it 'returns 422 and rolls back when a suggestion is invalid' do
+      stub_suggestions([
+                         { title: 'Valid subtask', priority: 'low' },
+                         { title: '', priority: 'low' } # too short -> invalid
+                       ])
+      url = "/api/v1/projects/#{project.id}/tasks/#{task.id}/suggest_subtasks" # forces task creation first
+
+      expect { post url }.not_to change(Task, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.parsed_body['errors']).to be_present
     end
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_22_125347) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_22_134302) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -28,12 +28,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_22_125347) do
     t.datetime "created_at", null: false
     t.text "description"
     t.date "due_date"
+    t.bigint "parent_id"
     t.integer "position", default: 0, null: false
     t.integer "priority", default: 1, null: false
     t.bigint "project_id", null: false
     t.integer "status", default: 0, null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_tasks_on_parent_id"
     t.index ["project_id", "position"], name: "index_tasks_on_project_id_and_position"
     t.index ["project_id"], name: "index_tasks_on_project_id"
     t.index ["status"], name: "index_tasks_on_status"
@@ -49,4 +51,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_22_125347) do
 
   add_foreign_key "projects", "users"
   add_foreign_key "tasks", "projects"
+  add_foreign_key "tasks", "tasks", column: "parent_id"
 end

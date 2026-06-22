@@ -3,6 +3,27 @@ require 'rails_helper'
 RSpec.describe Task, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
+    it { is_expected.to belong_to(:parent).class_name('Task').optional }
+    it { is_expected.to have_many(:subtasks).class_name('Task').with_foreign_key(:parent_id).dependent(:destroy) }
+  end
+
+  describe 'parent/subtasks relationship' do
+    let(:project) { create(:project) }
+
+    it 'nests subtasks under a parent task' do
+      parent = create(:task, project: project)
+      child = create(:task, project: project, parent: parent)
+
+      expect(parent.subtasks).to include(child)
+      expect(child.parent).to eq(parent)
+    end
+
+    it 'destroys subtasks when the parent is destroyed' do
+      parent = create(:task, project: project)
+      create(:task, project: project, parent: parent)
+
+      expect { parent.destroy }.to change(Task, :count).by(-2)
+    end
   end
 
   describe 'enums' do

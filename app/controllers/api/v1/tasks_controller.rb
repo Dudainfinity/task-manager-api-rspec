@@ -56,15 +56,25 @@ module Api
       end
 
       # POST /api/v1/projects/:project_id/tasks/:id/suggest_subtasks
-      # Asks Claude to break the task down into suggested subtasks.
+      # Asks Claude to break the task down, then persists the suggestions as child tasks.
       def suggest_subtasks
         result = Tasks::SuggestSubtasks.call(@task)
+        return render json: { error: result.error }, status: :bad_gateway unless result.success?
 
-        if result.success?
-          render json: { task_id: @task.id, suggestions: result.subtasks }, status: :ok
-        else
-          render json: { error: result.error }, status: :bad_gateway
+        subtasks = ActiveRecord::Base.transaction do
+          result.subtasks.map do |attrs|
+            @task.subtasks.create!(
+              title: attrs[:title],
+              priority: attrs[:priority],
+              project: @task.project,
+              status: :todo
+            )
+          end
         end
+
+        render json: TaskSerializer.new(subtasks).serializable_hash, status: :created
+      rescue ActiveRecord::RecordInvalid => e
+        render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
       end
 
       private

@@ -71,7 +71,7 @@ bundle exec rspec
 ```
 
 ```
-78 examples, 0 failures
+83 examples, 0 failures
 Line Coverage:   100.0% (161 / 161)
 Branch Coverage: 100.0% (30 / 30)
 ```
@@ -109,6 +109,7 @@ User
  └─ has_many Projects
 Project ── belongs_to User, has_many Tasks
 Task    ── belongs_to Project
+          belongs_to Parent (Task, opcional) · has_many Subtasks (Task)
           status:   todo | in_progress | done
           priority: low | medium | high
 ```
@@ -145,7 +146,7 @@ Base: `/api/v1`
 | `PATCH` | `/projects/:id/tasks/:tid` | Atualiza tarefa |
 | `DELETE` | `/projects/:id/tasks/:tid` | Remove tarefa |
 | `POST` | `/projects/:id/tasks/:tid/complete` | Conclui a tarefa (service object) |
-| `POST` | `/projects/:id/tasks/:tid/suggest_subtasks` | 🤖 Sugere subtarefas com a **Claude** (IA) |
+| `POST` | `/projects/:id/tasks/:tid/suggest_subtasks` | 🤖 Gera subtarefas com a **Claude** e as cria como tasks filhas |
 
 ### Exemplo
 
@@ -158,17 +159,19 @@ curl -X POST http://localhost:3000/api/v1/projects \
 curl -X POST http://localhost:3000/api/v1/projects/1/tasks -d "title=Escrever testes&priority=high"
 curl -X POST http://localhost:3000/api/v1/projects/1/tasks/1/complete
 
-# pede sugestões de subtarefas geradas pela Claude
+# gera subtarefas com a Claude e as persiste como tasks filhas (status: todo)
 curl -X POST http://localhost:3000/api/v1/projects/1/tasks/1/suggest_subtasks
-# => { "task_id": 1, "suggestions": [{ "title": "...", "priority": "high" }, ...] }
+# => 201 Created — JSON:API com as tasks filhas criadas (parent_id = 1)
 ```
 
 ## 🤖 Integração com IA (Claude)
 
 O endpoint `suggest_subtasks` usa o **SDK oficial da Anthropic** para pedir à Claude
-(`claude-opus-4-8`) que quebre uma tarefa em subtarefas. A lógica fica isolada no
-service object [`Tasks::SuggestSubtasks`](app/services/tasks/suggest_subtasks.rb), que
-força uma **tool call** para garantir saída estruturada (sem parsing frágil de texto).
+(`claude-opus-4-8`) que quebre uma tarefa em subtarefas, e então **persiste** cada
+sugestão como uma **task filha** (`parent_id`) no mesmo projeto — tudo em uma transação.
+A lógica de IA fica isolada no service object
+[`Tasks::SuggestSubtasks`](app/services/tasks/suggest_subtasks.rb), que força uma
+**tool call** para garantir saída estruturada (sem parsing frágil de texto).
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...   # necessário em runtime; nunca commitado
