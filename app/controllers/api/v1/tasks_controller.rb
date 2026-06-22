@@ -56,7 +56,7 @@ module Api
       end
 
       # POST /api/v1/projects/:project_id/tasks/:id/suggest_subtasks
-      # Asks Claude to break the task down, then persists the suggestions as child tasks.
+      # Pede para a Claude quebrar a tarefa e persiste as sugestões como tarefas filhas.
       def suggest_subtasks
         result = Tasks::SuggestSubtasks.call(@task)
         return render json: { error: result.error }, status: :bad_gateway unless result.success?

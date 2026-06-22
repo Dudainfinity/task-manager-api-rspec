@@ -1,5 +1,5 @@
-# Seed data for the Task Manager API.
-# Run with: bin/rails db:seed   (or db:setup to create + migrate + seed)
+# Dados de exemplo (seed) da API de gerenciamento de tarefas.
+# Rode com: bin/rails db:seed   (ou db:setup para criar + migrar + popular)
 
 puts "Cleaning database..."
 Task.delete_all

@@ -1,18 +1,18 @@
 module Projects
-  # Computes progress statistics for a project's tasks.
+  # Calcula as estatísticas de progresso das tarefas de um projeto.
   class ProgressCalculator
     def initialize(project)
       @project = project
     end
 
-    # Integer percentage (0–100) of tasks that are done.
+    # Porcentagem inteira (0–100) de tarefas concluídas.
     def percentage
       return 0 if total.zero?
 
       ((done_count.to_f / total) * 100).round
     end
 
-    # Breakdown of task counts grouped by status, always including every status key.
+    # Contagem de tarefas agrupada por status, sempre incluindo todas as chaves de status.
     def counts_by_status
       base = Task.statuses.keys.index_with(0)
       base.merge(tasks.group(:status).count)

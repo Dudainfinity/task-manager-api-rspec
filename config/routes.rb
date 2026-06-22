@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  # Health check — returns 200 if the app boots with no exceptions.
+  # Health check — retorna 200 se a aplicação sobe sem exceções.
   get "up" => "rails/health#show", as: :rails_health_check
 
   namespace :api do

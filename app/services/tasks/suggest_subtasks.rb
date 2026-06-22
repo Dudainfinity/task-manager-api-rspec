@@ -1,13 +1,13 @@
 module Tasks
-  # Uses Claude (Anthropic API) to break a task down into suggested subtasks.
+  # Usa a Claude (API da Anthropic) para quebrar uma tarefa em subtarefas sugeridas.
   #
   #   result = Tasks::SuggestSubtasks.call(task)
   #   result.success?  # => true / false
   #   result.subtasks  # => [{ title: "...", priority: "high" }, ...]
-  #   result.error     # => nil or a provider error message
+  #   result.error     # => nil ou a mensagem de erro do provedor
   #
-  # Structured output is guaranteed by forcing a single tool call, so the
-  # response is always a validated list of subtasks (no brittle text parsing).
+  # A saída estruturada é garantida forçando uma única tool call, então a
+  # resposta é sempre uma lista validada de subtarefas (sem parsing frágil de texto).
   class SuggestSubtasks
     MODEL = "claude-opus-4-8".freeze
     MAX_SUGGESTIONS = 5

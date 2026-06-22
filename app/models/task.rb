@@ -16,20 +16,20 @@ class Task < ApplicationRecord
   scope :due_today, -> { where.not(status: statuses[:done]).where(due_date: Date.current) }
   scope :ordered,   -> { order(:position, :id) }
 
-  # True when the task has a past due date and is not yet done.
+  # Verdadeiro quando a tarefa está com o prazo vencido e ainda não foi concluída.
   def overdue?
     due_date.present? && due_date < Date.current && !done?
   end
 
-  # Marks the task as done and stamps the completion time. Idempotent-safe:
-  # returns false if it was already done.
+  # Marca a tarefa como concluída e registra o horário. Idempotente:
+  # retorna false se ela já estava concluída.
   def complete!
     return false if done?
 
     update!(status: :done, completed_at: Time.current)
   end
 
-  # Reopens a completed task back to "todo" and clears the completion time.
+  # Reabre uma tarefa concluída de volta para "todo" e limpa o horário de conclusão.
   def reopen!
     return false unless done?
 

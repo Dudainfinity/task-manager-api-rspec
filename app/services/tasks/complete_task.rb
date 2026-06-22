@@ -1,9 +1,9 @@
 module Tasks
-  # Service object that completes a task, returning a small Result value object.
+  # Service object que conclui uma tarefa, retornando um pequeno objeto de valor Result.
   #
   #   result = Tasks::CompleteTask.call(task)
   #   result.success? # => true / false
-  #   result.error    # => nil or a message
+  #   result.error    # => nil ou uma mensagem
   class CompleteTask
     Result = Struct.new(:success, :task, :error, keyword_init: true) do
       def success? = success

@@ -23,16 +23,16 @@
 
 ---
 
-## 🎯 Destaques
+## Destaques
 
-- 🧪 **70 exemplos de RSpec** cobrindo modelos, *service objects* e requests (testes de integração).
-- 📊 **100% de cobertura** de linha **e** de branch, medida com **SimpleCov** e **exigida no CI** (mínimo 95% linha / 80% branch).
-- 🧩 **TDD com service objects** — regra de negócio isolada e testada de forma unitária (`Projects::ProgressCalculator`, `Tasks::CompleteTask`).
-- ✅ **shoulda-matchers** para specs de modelo expressivas (associações, validações, enums).
-- 🏭 **FactoryBot + Faker** para dados de teste limpos, com *traits*.
-- 🚀 **Pipeline CI/CD** (GitHub Actions): testes + cobertura, RuboCop, Brakeman e **build/publish da imagem Docker** no GitHub Container Registry.
+- **70 exemplos de RSpec** cobrindo modelos, *service objects* e requests (testes de integração).
+- **100% de cobertura** de linha **e** de branch, medida com **SimpleCov** e **exigida no CI** (mínimo 95% linha / 80% branch).
+- **TDD com service objects** — regra de negócio isolada e testada de forma unitária (`Projects::ProgressCalculator`, `Tasks::CompleteTask`).
+- **shoulda-matchers** para specs de modelo expressivas (associações, validações, enums).
+- **FactoryBot + Faker** para dados de teste limpos, com *traits*.
+- **Pipeline CI/CD** (GitHub Actions): testes + cobertura, RuboCop, Brakeman e **build/publish da imagem Docker** no GitHub Container Registry.
 
-## 🧱 Stack
+## Stack
 
 | Camada | Tecnologia |
 |---|---|
@@ -45,7 +45,7 @@
 | Qualidade | RuboCop (omakase), Brakeman |
 | CI/CD | GitHub Actions, Docker, GHCR |
 
-## 🧪 Estratégia de testes (TDD)
+## Estratégia de testes (TDD)
 
 A lógica de negócio fica em **objetos pequenos e testáveis**, e cada um tem seu spec:
 
@@ -82,7 +82,7 @@ O relatório HTML é gerado em `coverage/index.html`. Para exigir os limites loc
 COVERAGE=true bundle exec rspec   # falha se < 95% linha ou < 80% branch
 ```
 
-## 🔄 Pipeline CI/CD
+## Pipeline CI/CD
 
 Definido em [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml), dispara em push/PR para `main`:
 
@@ -102,7 +102,7 @@ docker pull ghcr.io/dudainfinity/task-manager-api-rspec:latest
 > O pacote no GHCR nasce **privado**. Para permitir `docker pull` anônimo, defina a
 > visibilidade como *public* em **Packages → task-manager-api-rspec → Package settings**.
 
-## 🗂️ Modelo de domínio
+## Modelo de domínio
 
 ```
 User
@@ -117,7 +117,7 @@ Task    ── belongs_to Project
 Regras de negócio testadas: progresso do projeto (% de tarefas concluídas), conclusão de tarefa
 (*idempotente*), reabertura, posição automática, detecção de atraso (`overdue?`) e *scopes*.
 
-## 🚀 Começando
+## Começando
 
 ```bash
 git clone https://github.com/Dudainfinity/task-manager-api-rspec.git
@@ -128,7 +128,7 @@ bin/rails db:setup       # cria, migra e popula com dados de exemplo
 bin/rails server         # http://localhost:3000
 ```
 
-## 📚 Endpoints
+## Endpoints
 
 Base: `/api/v1`
 
@@ -146,7 +146,7 @@ Base: `/api/v1`
 | `PATCH` | `/projects/:id/tasks/:tid` | Atualiza tarefa |
 | `DELETE` | `/projects/:id/tasks/:tid` | Remove tarefa |
 | `POST` | `/projects/:id/tasks/:tid/complete` | Conclui a tarefa (service object) |
-| `POST` | `/projects/:id/tasks/:tid/suggest_subtasks` | 🤖 Gera subtarefas com a **Claude** e as cria como tasks filhas |
+| `POST` | `/projects/:id/tasks/:tid/suggest_subtasks` | Gera subtarefas com a **Claude** e as cria como tasks filhas |
 
 ### Exemplo
 
@@ -164,7 +164,7 @@ curl -X POST http://localhost:3000/api/v1/projects/1/tasks/1/suggest_subtasks
 # => 201 Created — JSON:API com as tasks filhas criadas (parent_id = 1)
 ```
 
-## 🤖 Integração com IA (Claude)
+## Integração com IA (Claude)
 
 O endpoint `suggest_subtasks` usa o **SDK oficial da Anthropic** para pedir à Claude
 (`claude-opus-4-8`) que quebre uma tarefa em subtarefas, e então **persiste** cada
@@ -180,6 +180,6 @@ export ANTHROPIC_API_KEY=sk-ant-...   # necessário em runtime; nunca commitado
 > **Testes não chamam a API real**: o cliente Anthropic é injetável e fica *stubado*
 > nos specs, então a suíte (e o CI) roda sem chave e sem rede — mantendo 100% de cobertura.
 
-## 📝 Licença
+## Licença
 
 Distribuído sob a licença MIT. Veja [`LICENSE`](LICENSE).

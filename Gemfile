@@ -7,16 +7,16 @@ gem "pg", "~> 1.1"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 
-# JSON serialization
+# Serialização JSON
 gem "jsonapi-serializer", "~> 2.2"
 
-# Pagination
+# Paginação
 gem "kaminari", "~> 1.2"
 
-# Cross-Origin Resource Sharing
+# Compartilhamento de recursos entre origens (CORS)
 gem "rack-cors"
 
-# Official Anthropic SDK — Claude-powered subtask suggestions
+# SDK oficial da Anthropic — sugestão de subtarefas com a Claude
 gem "anthropic", "~> 1.49"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
@@ -39,12 +39,12 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 
   # --- Testing / TDD toolchain ---
-  gem "rspec-rails", "~> 7.1"          # RSpec test framework
-  gem "factory_bot_rails", "~> 6.4"    # test data factories
-  gem "faker", "~> 3.4"                # fake data
-  gem "shoulda-matchers", "~> 6.4"     # expressive model matchers
+  gem "rspec-rails", "~> 7.1"          # framework de testes RSpec
+  gem "factory_bot_rails", "~> 6.4"    # fábricas de dados de teste
+  gem "faker", "~> 3.4"                # dados falsos
+  gem "shoulda-matchers", "~> 6.4"     # matchers expressivos de modelo
 end
 
 group :test do
-  gem "simplecov", "~> 0.22", require: false  # code coverage
+  gem "simplecov", "~> 0.22", require: false  # cobertura de código
 end
